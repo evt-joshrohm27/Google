@@ -1,38 +1,56 @@
-workspace(name = "highway")
+# coding=utf-8
+# Copyright 2022 The Pax Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Workspace file for Praxis."""
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
-maybe(
-    http_archive,
-    name = "com_google_googletest",
-    urls = ["https://github.com/google/googletest/archive/e2239ee6043f73722e7aa812a459f54a28552929.zip"],
-    sha256 = "8daa1a71395892f7c1ec5f7cb5b099a02e606be720d62f1a6a98f8f8898ec826",
-    strip_prefix = "googletest-e2239ee6043f73722e7aa812a459f54a28552929",
-)
-
-# See https://google.github.io/googletest/quickstart-bazel.html
-maybe(
-    http_archive,
-    name = "rules_cc",
-    urls = ["https://github.com/bazelbuild/rules_cc/archive/40548a2974f1aea06215272d9c2b47a14a24e556.zip"],
-    sha256 = "56ac9633c13d74cb71e0546f103ce1c58810e4a76aa8325da593ca4277908d72",
-    strip_prefix = "rules_cc-40548a2974f1aea06215272d9c2b47a14a24e556",
-)
-
-# Need recent version for config_setting_group
-maybe(
-    http_archive,
+http_archive(
     name = "bazel_skylib",
-    urls = ["https://github.com/bazelbuild/bazel-skylib/releases/download/0.9.0/bazel_skylib-0.9.0.tar.gz"],
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.2.1/bazel-skylib-1.2.1.tar.gz",
+        "https://github.com/bazelbuild/bazel-skylib/releases/download/1.2.1/bazel-skylib-1.2.1.tar.gz",
+    ],
+    sha256 = "f7be3474d42aae265405a592bb7da8e171919d74c16f082a5457840f06054728",
 )
 
-maybe(
-    http_archive,
-    name = "rules_license",
+load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")  #buildifier: disable=load-on-top
+
+http_archive(
+    name = "com_google_protobuf",  # v3.19.4 // 2022-01-2
+    sha256 = "3bd7828aa5af4b13b99c191e8b1e884ebfa9ad371b0ce264605d347f135d2568",
+    strip_prefix = "protobuf-3.19.4",
+    url = "https://github.com/protocolbuffers/protobuf/archive/v3.19.4.tar.gz",
+)
+
+bazel_skylib_workspace()
+
+http_archive(
+    name = "rules_python",
+    sha256 = "cdf6b84084aad8f10bf20b46b77cb48d83c319ebe6458a18e9d2cebf57807cdd",
+    strip_prefix = "rules_python-0.8.1",
+    url = "https://github.com/bazelbuild/rules_python/archive/refs/tags/0.8.1.tar.gz",
+)
+
+http_archive(
+    name = "zlib",
+    build_file = "@com_google_protobuf//:third_party/zlib.BUILD",
+    sha256 = "c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1",
+    strip_prefix = "zlib-1.2.11",
     urls = [
-        "https://github.com/bazelbuild/rules_license/releases/download/0.0.4/rules_license-0.0.4.tar.gz",
-        "https://mirror.bazel.build/github.com/bazelbuild/rules_license/releases/download/0.0.4/rules_license-0.0.4.tar.gz",
+        "https://mirror.bazel.build/zlib.net/zlib-1.2.11.tar.gz",
+        "https://zlib.net/zlib-1.2.11.tar.gz",
     ],
-    sha256 = "6157e1e68378532d0241ecd15d3c45f6e5cfd98fc10846045509fb2a7cc9e381",
 )
