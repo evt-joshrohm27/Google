@@ -1,152 +1,38 @@
-# Copyright 2022-2023 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+workspace(name = "highway")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
-RULES_JVM_EXTERNAL_TAG = "4.0"
-
-RULES_JVM_EXTERNAL_SHA = "31701ad93dbfe544d597dbe62c9a1fdd76d81d8a9150c2bf1ecf928ecdf97169"
-
-http_archive(
-    name = "rules_jvm_external",
-    sha256 = RULES_JVM_EXTERNAL_SHA,
-    strip_prefix = "rules_jvm_external-%s" % RULES_JVM_EXTERNAL_TAG,
-    url = "https://github.com/bazelbuild/rules_jvm_external/archive/%s.zip" % RULES_JVM_EXTERNAL_TAG,
+maybe(
+    http_archive,
+    name = "com_google_googletest",
+    urls = ["https://github.com/google/googletest/archive/e2239ee6043f73722e7aa812a459f54a28552929.zip"],
+    sha256 = "8daa1a71395892f7c1ec5f7cb5b099a02e606be720d62f1a6a98f8f8898ec826",
+    strip_prefix = "googletest-e2239ee6043f73722e7aa812a459f54a28552929",
 )
 
-load("@rules_jvm_external//:defs.bzl", "maven_install")
-load("@rules_jvm_external//:specs.bzl", "maven")
-
-# All artifacts here should have "neverlink = True" unless it's really required to distribute them
-maven_install(
-    artifacts = [
-        maven.artifact(
-            "com.google.guava",
-            "guava",
-            "31.0-jre",
-            neverlink = True,
-        ),
-        maven.artifact(
-            "org.apache.commons",
-            "commons-compress",
-            "1.10",
-            neverlink = True,
-        ),
-        maven.artifact(
-            "commons-lang",
-            "commons-lang",
-            "2.6",
-            neverlink = True,
-        ),
-        maven.artifact(
-            "org.apache.hadoop",
-            "hadoop-common",
-            "2.2.0",
-            neverlink = True,
-        ),
-        maven.artifact(
-            "org.apache.avro",
-            "avro",
-            "1.10.2",
-            neverlink = True,
-        ),
-        maven.artifact(
-            "org.apache.tez",
-            "tez-api",
-            "0.8.5",
-            neverlink = True,
-        ),
-        maven.artifact(
-            "org.apache.tez",
-            "tez-common",
-            "0.8.5",
-            neverlink = True,
-        ),
-        maven.artifact(
-            "org.apache.curator",
-            "apache-curator",
-            "2.7.1",
-            neverlink = True,
-        ),
-        maven.artifact(
-            "org.apache.hive",
-            "hive-exec",
-            "2.2.0",
-            neverlink = True,
-        ),
-        maven.artifact(
-            "org.slf4j",
-            "slf4j-api",
-            "1.7.10",
-            neverlink = True,
-        ),
-    ],
-    excluded_artifacts = [
-        "org.pentaho:pentaho-aggdesigner-algorithm",
-    ],
-    fetch_sources = True,
-    repositories = [
-        "https://maven.google.com",
-        "https://repo1.maven.org/maven2",
-    ],
-    version_conflict_policy = "pinned",
+# See https://google.github.io/googletest/quickstart-bazel.html
+maybe(
+    http_archive,
+    name = "rules_cc",
+    urls = ["https://github.com/bazelbuild/rules_cc/archive/40548a2974f1aea06215272d9c2b47a14a24e556.zip"],
+    sha256 = "56ac9633c13d74cb71e0546f103ce1c58810e4a76aa8325da593ca4277908d72",
+    strip_prefix = "rules_cc-40548a2974f1aea06215272d9c2b47a14a24e556",
 )
 
-# Tests need dependencies in the runtime. Since there is no way to mark the dependency as both
-# "neverlink" and "testonly", create a separate declaration specifically for tests.
-# Code in java/ folder must not depend on this declaration.
-maven_install(
-    name = "maven_tests",
-    artifacts = [
-        "org.apache.hadoop:hadoop-common:2.9.0",
-        "org.apache.hadoop:hadoop-mapreduce-client-common:2.9.0",
-        "org.apache.hadoop:hadoop-mapreduce-client-core:2.9.0",
-        "org.apache.hive:hive-exec:2.2.0",
-        "org.apache.tez:tez-api:0.8.5",
-        "org.apache.tez:tez-common:0.8.5",
-        "commons-lang:commons-lang:2.6",
-        "com.google.auto.value:auto-value:1.8.2",
-        "com.google.auto.value:auto-value-annotations:1.8.2",
-        "com.google.guava:guava:29.0-jre",
-        "com.google.truth:truth:1.1.3",
-        "com.google.truth.extensions:truth-java8-extension:1.1.3",
-        "org.apache.curator:apache-curator:2.7.1",
-        "junit:junit:4.13.2",
-        "org.mockito:mockito-core:3.11.1",
-        "org.slf4j:slf4j-api:1.7.10",
-    ],
-    excluded_artifacts = [
-        "org.pentaho:pentaho-aggdesigner-algorithm",
-    ],
-    fetch_sources = True,
-    repositories = [
-        "https://maven.google.com",
-        "https://repo1.maven.org/maven2",
-    ],
+# Need recent version for config_setting_group
+maybe(
+    http_archive,
+    name = "bazel_skylib",
+    urls = ["https://github.com/bazelbuild/bazel-skylib/releases/download/0.9.0/bazel_skylib-0.9.0.tar.gz"],
 )
 
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-
-http_archive(
-    name = "rules_pkg",
-    sha256 = "8a298e832762eda1830597d64fe7db58178aa84cd5926d76d5b744d6558941c2",
+maybe(
+    http_archive,
+    name = "rules_license",
     urls = [
-        "https://mirror.bazel.build/github.com/bazelbuild/rules_pkg/releases/download/0.7.0/rules_pkg-0.7.0.tar.gz",
-        "https://github.com/bazelbuild/rules_pkg/releases/download/0.7.0/rules_pkg-0.7.0.tar.gz",
+        "https://github.com/bazelbuild/rules_license/releases/download/0.0.4/rules_license-0.0.4.tar.gz",
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_license/releases/download/0.0.4/rules_license-0.0.4.tar.gz",
     ],
+    sha256 = "6157e1e68378532d0241ecd15d3c45f6e5cfd98fc10846045509fb2a7cc9e381",
 )
-
-load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
-
-rules_pkg_dependencies()
