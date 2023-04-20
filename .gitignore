@@ -1,4 +1,48 @@
-docs/g3doc/*
-docs/html/*
-docs/md/*
-docs/rst/*
+node_modules
+bower_components
+vendor
+!/assets/sass/vendor
+/php-scoper/*
+!/php-scoper/composer.*
+!/php-scoper/README.md
+/third-party
+/release
+phpunit.xml
+.idea
+npm-debug.log
+/dist
+/languages
+/storybook-static
+google-site-kit*.zip
+.phpunit.result.cache
+
+# Editors
+*.esproj
+*.tmproj
+*.tmproject
+tmtags
+.*.sw[a-z]
+*.un~
+Session.vim
+*.swp
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Mac OSX
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Backstop
+tests/backstop/html_report/
+tests/backstop/tests/
+
+# Jest
+coverage/
+tests/e2e/screenshots

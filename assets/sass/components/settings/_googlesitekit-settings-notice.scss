@@ -1,0 +1,206 @@
+/**
+ * Settings notice styles.
+ *
+ * Site Kit by Google, Copyright 2021 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+.googlesitekit-settings-notice {
+	background-color: $c-background-notice;
+	border-radius: $br-sm;
+	color: $c-text-notice;
+	display: flex;
+	font-size: $fs-body-sm;
+	letter-spacing: $ls-xs;
+	line-height: $lh-body-sm;
+	margin: 1.5em 0;
+	max-width: 1098px;
+	padding: $grid-gap-phone;
+
+	@media (min-width: $bp-desktop) {
+		padding-left: $grid-gap-desktop;
+	}
+
+	.googlesitekit-settings-notice__body {
+		flex-grow: 1;
+		min-width: 0;
+
+		@media (min-width: $bp-tablet) {
+			display: flex;
+		}
+	}
+
+	.googlesitekit-settings-notice__children-container {
+		flex-grow: 1;
+	}
+
+	.googlesitekit-settings-notice__icon {
+		line-height: 0;
+		margin-right: 10px;
+	}
+
+	.googlesitekit-settings-notice__text {
+		flex-grow: 1;
+		line-height: 20px; // Match icon height.
+	}
+
+	.mdc-select:not(.mdc-select--disabled),
+	.mdc-text-field:not(.mdc-text-field--disabled) {
+
+		.mdc-notched-outline__leading,
+		.mdc-notched-outline__notch,
+		.mdc-notched-outline__trailing {
+			border-color: $c-utility-outline;
+		}
+
+		.mdc-floating-label {
+			color: $c-text-notice-info;
+		}
+	}
+
+	.mdc-text-field:not(.mdc-text-field--disabled) {
+
+		.mdc-text-field__input {
+			color: $c-text-notice-info;
+		}
+
+		&:not(.mdc-text-field--focused) {
+
+			.mdc-text-field__input:hover ~ .mdc-notched-outline {
+
+				.mdc-notched-outline__leading,
+				.mdc-notched-outline__notch,
+				.mdc-notched-outline__trailing {
+					border-color: $c-border-notice-info-hover;
+				}
+			}
+		}
+	}
+
+	// TODO: decouple select styles from type-specific colors.
+	.mdc-select:not(.mdc-select--disabled) {
+
+		.mdc-select__selected-text {
+			color: $c-text-notice-info;
+		}
+
+		&:not(.mdc-select--focused) {
+
+			.mdc-select__selected-text:hover ~ .mdc-notched-outline {
+
+				.mdc-notched-outline__leading,
+				.mdc-notched-outline__notch,
+				.mdc-notched-outline__trailing {
+					border-color: $c-neutral-n-900;
+				}
+			}
+		}
+	}
+}
+
+.googlesitekit-settings-notice--single-row {
+
+	.googlesitekit-settings-notice__learn-more {
+		flex-shrink: 0;
+		line-height: 20px; // to match icon height.
+		text-align: right;
+
+		@media (min-width: $bp-tablet) {
+			padding-left: $grid-gap-desktop;
+			text-align: inherit;
+		}
+	}
+}
+
+.googlesitekit-settings-notice--multi-row {
+
+	.googlesitekit-settings-notice__body {
+		flex-direction: column;
+	}
+
+	.googlesitekit-settings-notice__inner-row {
+		padding-top: $grid-gap-phone;
+
+		@media (min-width: $bp-tablet) {
+			display: flex;
+			padding-top: $grid-gap-desktop;
+		}
+
+		@media (min-width: $bp-desktop) {
+			padding-top: $grid-gap-desktop;
+		}
+	}
+
+	.googlesitekit-settings-notice__learn-more {
+		flex-shrink: 0;
+		text-align: right;
+
+		@media (min-width: $bp-tablet) {
+			display: flex;
+			flex-direction: column;
+			justify-content: flex-end;
+			padding-bottom: 4px;
+			padding-right: 12px;
+			text-align: left;
+		}
+
+		@media (min-width: $bp-desktop) {
+			margin-left: $grid-gap-desktop;
+		}
+	}
+}
+
+.googlesitekit-settings-notice--warning {
+	background-color: $c-background-notice-warning;
+	color: $c-text-notice-warning;
+}
+
+.googlesitekit-settings-notice--info {
+	background-color: $c-background-notice-info;
+	color: $c-text-notice-info;
+
+	.googlesitekit-cta-link {
+		color: $c-content-secondary;
+	}
+}
+
+.googlesitekit-settings-notice--suggestion {
+	background-color: $c-background-notice-suggestion;
+	color: $c-text-notice-suggestion;
+}
+
+// This is a bit of temporary styling to improve the look of the initial implementation of the UA cutoff warning.
+// It should be reviewed and possibly removed as part of https://github.com/google/site-kit-wp/issues/6702.
+.googlesitekit-settings-notice-ua-cutoff-warning {
+	max-width: none;
+
+	.googlesitekit-settings-notice__icon {
+		padding-top: 10px;
+	}
+
+	.googlesitekit-settings-notice__body {
+		align-items: center;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 14px;
+	}
+
+	.googlesitekit-settings-notice__text {
+		flex: 1 1 50%;
+	}
+}
+
+.googlesitekit-settings-notice-ua-cutoff-warning__notice {
+	margin: 0 14px 0 0;
+}
