@@ -1,137 +1,177 @@
-# Safe Active Record
+# Saxml (aka Sax)
 
-A security middleware to defend against
-[SQL injection](https://en.wikipedia.org/wiki/SQL_injection) in Ruby on Rails
-Active Record.
+Saxml is an experimental system that serves
+[Paxml](https://github.com/google/paxml), [JAX](https://github.com/google/jax),
+and [PyTorch](https://pytorch.org/) models for inference.
 
-This middleware decorates
-[unsafe Active Record query APIs](https://rails-sqli.org/) to enforce use of
-SQL statements created from secure-by-construction types.
+A Sax cell (aka Sax cluster) consists of an admin server and a group of model
+servers. The admin server keeps track of model servers, assigns published models
+to model servers to serve, and helps clients locate model servers serving
+specific published models.
 
-## Secure-by-construction
+The example below walks through setting up a Sax cell and starting a TPU model
+server in the cell. Similar steps can be taken to start GPU model servers.
 
-In a classic SQLi case, user supplied untrusted input is often mixed in with SQL
-queries through string concatenation or interpolation. Most of the time, these
-vulnerable injectable SQL strings can be rewritten securely to string literals
-with parametrized queries as placeholders for user inputs. If this string
-literal contract can be enforced most of the time, the bar to make SQLi mistakes
-is much higher, and developers and product security engineers would only need to
-spend time on those rare exception cases in code review/audit.
+## Install Sax
 
-In some static typed languages, constant string type can be used to enforce the
-above mentioned contract, but Ruby is a dynamically typed language. While there
-is such a thing as class Constant in Ruby, the syntax requirement to define them
-in a class scope makes them far away from query API invocation sites, deviating
-much from developers' habits.
+### Install and set up the `gcloud` tool
 
-Ruby Symbol is an immutable type that can be used to approximate constant string
-literals, with the exception that a symbol can be created at runtime (e.g.
-`"xyz".to_sym`. However, symbols written in their literal format (e.g.
-`:symbol`) are loaded into `Symbol.all_symbols` array at the code load time.
-This means that with `eager_load` feature enabled (typical in Rails apps), a
-niche point can be found during apps boot time so that all existing symbols can
-approximate safe string literals, whose creation proceeds any unsafe
-construction (e.g. `"where id = #{id}".to_sym`). This enables the enforcement of
-Symbol type as the safe input type to ActiveRecord query APIs.
+[Install](https://cloud.google.com/sdk/gcloud#download_and_install_the) the
+`gcloud` CLI and set the default account and project:
 
-The enforcement of the contracted type is done by decorating those query APIs
-that are subject to SQLi, and banning String type input. As some original APIs
-already distinguish Symbol and String type inputs, Symbol is wrapped into a new
-trusted type under the safe contract to avoid confusion internally. The trusted
-type can only be constructed from a safe symbol thus achieving
-secure-by-construction.
-
-## Setup
-
-`SafeActiveRecord.activate!` needs to be called before an application starts to
-process user input, but after eager loading finishes, so that a snapshot of
-safe symbols can be taken. In a rails app, it can be done at
-[config.after_initialize](https://guides.rubyonrails.org/configuring.html#config-after-initialize).
-
-The method takes in a hash into which a few options can be passed:
-
-* `safe_query_mode`: `:strict` or `:lax`; `:lax` mode allows usage of
-  `RiskilyAssumeTrustedString` type.
-* `dry_run`: true/false, default to false; when set to true, only warnings
-  will be emitted but otherwise an exception will be raised when unconforming
-  types are passed in.
-* `intercept_load`: true/false, default to false; when set to true,
-  `require`/`load`/`require_relative` will be intercepted in order to
-  calculate the delta of symbols created during new Ruby source code loading,
-  and add them to the trusted symbol set. This is to compensate for use cases
-  when eager_load is turned off, typically during local development.
-
-    **WARNING**: make sure `intercept_load` is disabled in all production
-    systems including Rake tasks. See [limitation section](#limitation)
-    for more details.
-
-    For instance:
-
-    ```ruby
-     config.after_initialize do
-         SafeActiveRecord.activate!({ intercept_load: !config.eager_load })
-     end
-    ```
-
-## Safe types
-
-Three new types are considered safe types under the new contract:
-
-* TrustedSymbol: the secure-by-construction type that takes in a safe symbol.
-  Most SQL strings should be rewritten to this type.
-* UncheckedString: escaping type that assumes the input is fully trusted. In
-  very few cases, SQL query can't be constructed from string literals and the
-  usage of such a type should raise a signal for security code review.
-* RiskilyAssumeTrustedString: similar to UncheckedString but should only be
-  used during adoption of SafeActiveRecord when certain rewriting takes
-  substantial efforts.
-
-    An old SQL
-
-    ```ruby
-    Obj.where("select * from table where user = #{id}")
-    ```
-
-    would need to be rewritten to
-
-    ```ruby
-    Obj.where(SafeActiveRecord::TrustedSymbol.new(:'select * from table where user
-    = ?'), id)
-    ```
-
-## Limitation
-
-`intercept_load` should be disabled in production system for the following reasons:
-
-* This mode is unfortunately not thread safe and could lead to unsafe
-  symbols being treated as trusted in the worst case. It's only a compatible mode
-  to support local development that truns off eager load to expedite development
-  velocity, and it should never be enabled for production where concurrency is
-  controllable by a malicious user.
-* When this mode is enabled, SafeActiveRecord is recalculating the symbol table
-  often instead of at initial load, which significantly impacts performance.
-
-For SafeActiveRecord to function properly when `intercept_load` is disabled,
-`eager_load` should be enabled, which is anyway a [best practice](https://guides.rubyonrails.org/autoloading_and_reloading_constants.html#eager-loading)
-in Rails for production environments. In most cases `eager_load` is enabled by
-default, but there are some exceptions such as Rake tasks.
-
-### Rake tasks
-
-Rake tasks do not eager load in older versions of Rails. In Rails 6.1 and
-above, a `rake_eager_load` configuration has been introduced, but is disabled
-by default. To enable eager load for Rake task, switch `rake_eager_load` to
-true.
-
-For instance:
-
-```ruby
-config.rake_eager_load = true
+```
+gcloud config set account <your-email-account>
+gcloud config set project <your-project>
 ```
 
-Note that many Ruby frameworks such as [Resque](https://github.com/resque/resque#introduction)
-are using Rake tasks under the hood.
+### Create a Cloud Storage bucket to store Sax server states
 
-## Disclaimer
+[Create](https://cloud.google.com/storage/docs/creating-buckets) a
+Cloud Storage bucket:
 
-This is not an officially supported Google product.
+```
+GSBUCKET=sax-data
+gcloud storage buckets create gs://${GSBUCKET}
+```
+
+### Create a Compute Engine VM instance for the admin server
+
+[Create](https://cloud.google.com/compute/docs/create-linux-vm-instance) a
+Compute Engine VM instance:
+
+```
+gcloud compute instances create sax-admin \
+  --zone=us-central1-b \
+  --machine-type=e2-standard-8 \
+  --boot-disk-size=200GB \
+  --scopes=https://www.googleapis.com/auth/cloud-platform
+```
+
+### Create a Cloud TPU VM instance for a model server
+
+Use this [guide](https://cloud.google.com/tpu/docs/users-guide-tpu-vm) to
+enable the Cloud TPU API in a Google Cloud project.
+
+Create a Cloud TPU VM instance:
+
+```
+
+gcloud compute tpus tpu-vm create sax-tpu \
+  --zone=us-central2-b \
+  --accelerator-type=v4-8 \
+  --version=tpu-vm-v4-base \
+  --scopes=https://www.googleapis.com/auth/cloud-platform
+```
+
+### Start the Sax admin server
+
+SSH to the Compute Engine VM instance:
+
+```
+gcloud compute ssh --zone=us-central1-b sax-admin
+```
+
+Inside the VM instance, clone the Sax repo and initialize the environment:
+
+```
+git clone https://github.com/google/saxml.git
+cd saxml
+saxml/tools/init_cloud_vm.sh
+```
+
+Configure the Sax admin server. This only needs to be done once:
+
+```
+bazel run saxml/bin:admin_config -- \
+  --sax_cell=/sax/test \
+  --sax_root=gs://${GSBUCKET}/sax-root \
+  --fs_root=gs://${GSBUCKET}/sax-fs-root \
+  --alsologtostderr
+```
+
+Start the Sax admin server:
+
+```
+bazel run saxml/bin:admin_server -- \
+  --sax_cell=/sax/test \
+  --sax_root=gs://${GSBUCKET}/sax-root \
+  --port=10000 \
+  --alsologtostderr
+```
+
+### Start the Sax model server
+
+SSH to the Cloud TPU VM instance:
+
+```
+gcloud compute tpus tpu-vm ssh --zone=us-central2-b sax-tpu
+```
+
+Inside the VM instance, clone the Sax repo and initialize the environment:
+
+```
+git clone https://github.com/google/saxml.git
+cd saxml
+saxml/tools/init_cloud_vm.sh
+```
+
+Start the Sax model server:
+
+```
+SAX_ROOT=gs://${GSBUCKET}/sax-root \
+bazel run saxml/server:server -- \
+  --sax_cell=/sax/test \
+  --port=10001 \
+  --platform_chip=tpuv4 \
+  --platform_topology=2x2x1 \
+  --alsologtostderr
+```
+
+You should see a log message "Joined [admin server IP:port]" from the model server to indicate it has successfully joined the admin server.
+
+## Use Sax
+
+Sax comes with a command-line tool called `saxutil` for easy usage:
+
+```
+# From the `saxml` repo root directory:
+alias saxutil='bazel run saxml/bin:saxutil -- --sax_root=gs://${GSBUCKET}/sax-root'
+```
+
+`saxutil` supports the following commands:
+
+- `saxutil help`: Show general help or help about a particular command.
+- `saxutil ls`: List all cells, all models in a cell, or a particular model.
+- `saxutil publish`: Publish a model.
+- `saxutil unpublish`: Unpublish a model.
+- `saxutil update`: Update a model.
+- `saxutil lm.generate`: Use a language model generate suffixes from a prefix.
+- `saxutil lm.score`: Use a language model to score a prefix and suffix.
+- `saxutil lm.embed`: Use a language model to embed text into a vector.
+- `saxutil vm.generate`: Use a vision model to generate images from text.
+- `saxutil vm.classify`: Use a vision model to classify an image.
+- `saxutil vm.embed`: Use a vision model to embed an image into a vector.
+
+As an example, Sax comes with a Pax language model] servable on a Cloud TPU VM v4-8 instance. Follow the [Paxml tutorial](saxml.server.pax.lm.params.lm_cloud.LmCloudSpmd2B) to generate a checkpoint for this model. This model can then be published in Sax:
+
+```
+saxutil publish \
+  /sax/test/lm2b \
+  saxml.server.pax.lm.params.lm_cloud.LmCloudSpmd2B \
+  gs://${GSBUCKET}/checkpoints/checkpoint_00000000 \
+  1
+```
+
+Check if the model is loaded by looking at the "selected replica address" column of this command's output:
+
+```
+saxutil ls /sax/test/lm2b
+```
+
+When the model is loaded, issue a query:
+
+```
+saxutil lm.generate /sax/test/lm2b "Q: Who is Harry Porter's mother? A: "
+```
+
+The result will be printed in the terminal.

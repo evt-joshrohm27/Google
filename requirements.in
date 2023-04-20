@@ -1,19 +1,13 @@
-# To update requirements.txt for praxis and paxml, run:
-# cd ../../paxml/pip_package && bash ./compile_requirements.sh
+--find-links https://storage.googleapis.com/jax-releases/libtpu_releases.html
 
+importlib-metadata
 absl-py
-clu
-einops
-fiddle @ git+https://github.com/google/fiddle
-flax
-jax @ git+https://github.com/google/jax
-jax-bitempered-loss
-lingvo
+grpcio
+grpcio-reflection
+portpicker
 numpy
-optax
-optax-shampoo
-tensorflow~=2.9.2
-tensorflow-text~=2.9.0
-tensorflow-datasets==4.8.3
-tfds-nightly==4.8.3.dev202303280045
-tensorflow-metadata==1.12.0
+lingvo==0.12.6
+jax[tpu] @ git+https://github.com/google/jax
+orbax==0.1.6
+paxml @ git+https://github.com/google/paxml
+praxis @ git+https://github.com/google/praxis
