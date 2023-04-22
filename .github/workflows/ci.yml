@@ -15,7 +15,7 @@ jobs:
     steps:
       # Checks out syzkaller repo at the path.
       - name: checkout
-        uses: actions/checkout@629c2de402a417ea7690ca6ce3f33229e27606a5 # v2
+        uses: actions/checkout@v3 # v2
         with:
           path: gopath/src/github.com/google/syzkaller
           # This is needed for tools/check-commits.sh
@@ -39,7 +39,7 @@ jobs:
     runs-on: self-hosted
     steps:
     - name: checkout
-      uses: actions/checkout@629c2de402a417ea7690ca6ce3f33229e27606a5 # v2
+      uses: actions/checkout@v3 # v2
       with:
         path: gopath/src/github.com/google/syzkaller
     - name: cache
@@ -60,7 +60,7 @@ jobs:
     runs-on: self-hosted
     steps:
     - name: checkout
-      uses: actions/checkout@629c2de402a417ea7690ca6ce3f33229e27606a5 # v2
+      uses: actions/checkout@v3 # v2
       with:
         path: gopath/src/github.com/google/syzkaller
     - name: cache
@@ -82,7 +82,7 @@ jobs:
         target: [presubmit_arch_linux, presubmit_arch_freebsd, presubmit_arch_netbsd, presubmit_arch_openbsd, presubmit_arch_darwin, presubmit_arch_windows, presubmit_arch_executor]
     steps:
       - name: checkout
-        uses: actions/checkout@629c2de402a417ea7690ca6ce3f33229e27606a5 # v2
+        uses: actions/checkout@v3 # v2
         with:
           path: gopath/src/github.com/google/syzkaller
       - name: cache
@@ -96,7 +96,7 @@ jobs:
     runs-on: self-hosted
     steps:
     - name: checkout
-      uses: actions/checkout@629c2de402a417ea7690ca6ce3f33229e27606a5 # v2
+      uses: actions/checkout@v3 # v2
       with:
         path: gopath/src/github.com/google/syzkaller
     - name: cache
@@ -110,7 +110,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@629c2de402a417ea7690ca6ce3f33229e27606a5 # v2
+        uses: actions/checkout@v3 # v2
         with:
           path: gopath/src/github.com/google/syzkaller
       - name: cache
