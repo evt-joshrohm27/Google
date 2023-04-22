@@ -1,14 +1,44 @@
-# Site Kit by Google
+# syzkaller - kernel fuzzer
 
-Site Kit is a one-stop solution for WordPress users to use everything Google has to offer to make them successful on the web.
+[![CI Status](https://github.com/google/syzkaller/workflows/ci/badge.svg)](https://github.com/google/syzkaller/actions?query=workflow/ci)
+[![OSS-Fuzz](https://oss-fuzz-build-logs.storage.googleapis.com/badges/syzkaller.svg)](https://bugs.chromium.org/p/oss-fuzz/issues/list?q=label:Proj-syzkaller)
+[![Go Report Card](https://goreportcard.com/badge/github.com/google/syzkaller)](https://goreportcard.com/report/github.com/google/syzkaller)
+[![Coverage Status](https://codecov.io/gh/google/syzkaller/graph/badge.svg)](https://codecov.io/gh/google/syzkaller)
+[![GoDoc](https://godoc.org/github.com/google/syzkaller?status.svg)](https://godoc.org/github.com/google/syzkaller)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
-Learn more: [https://sitekit.withgoogle.com](https://sitekit.withgoogle.com)
+`syzkaller` (`[siːzˈkɔːlə]`) is an unsupervised coverage-guided kernel fuzzer.\
+Supported OSes: `Akaros`, `FreeBSD`, `Fuchsia`, `gVisor`, `Linux`, `NetBSD`, `OpenBSD`, `Windows`.
 
-## Contributing
+Mailing list: [syzkaller@googlegroups.com](https://groups.google.com/forum/#!forum/syzkaller) (join on [web](https://groups.google.com/forum/#!forum/syzkaller) or by [email](mailto:syzkaller+subscribe@googlegroups.com)).
 
-Any kind of contribution to Site Kit by Google is welcome. Head over to the [Contributor Handbook](https://github.com/google/site-kit-wp/wiki) to get started, or directly to the [Engineering set up quickstart](https://github.com/google/site-kit-wp/wiki/Engineering#set-up-site-kit-project) to set up Site Kit locally. :wink:
+Found bugs: [Akaros](docs/akaros/found_bugs.md), [Darwin/XNU](docs/darwin/README.md), [FreeBSD](docs/freebsd/found_bugs.md), [Linux](docs/linux/found_bugs.md), [NetBSD](docs/netbsd/found_bugs.md), [OpenBSD](docs/openbsd/found_bugs.md), [Windows](docs/windows/README.md).
 
-## Requirements
+## Documentation
 
-* WordPress >= 5.2
-* PHP >= 5.6
+Initially, syzkaller was developed with Linux kernel fuzzing in mind, but now
+it's being extended to support other OS kernels as well.
+Most of the documentation at this moment is related to the [Linux](docs/linux/setup.md) kernel.
+For other OS kernels check:
+[Akaros](docs/akaros/README.md),
+[Darwin/XNU](docs/darwin/README.md),
+[FreeBSD](docs/freebsd/README.md),
+[Fuchsia](docs/fuchsia/README.md),
+[NetBSD](docs/netbsd/README.md),
+[OpenBSD](docs/openbsd/setup.md),
+[Starnix](docs/starnix/README.md),
+[Windows](docs/windows/README.md),
+[gVisor](docs/gvisor/README.md).
+
+- [How to install syzkaller](docs/setup.md)
+- [How to use syzkaller](docs/usage.md)
+- [How syzkaller works](docs/internals.md)
+- [How to install syzbot](docs/setup_syzbot.md)
+- [How to contribute to syzkaller](docs/contributing.md)
+- [How to report Linux kernel bugs](docs/linux/reporting_kernel_bugs.md)
+- [Tech talks and articles](docs/talks.md)
+- [Research work based on syzkaller](docs/research.md)
+
+## Disclaimer
+
+This is not an official Google product.

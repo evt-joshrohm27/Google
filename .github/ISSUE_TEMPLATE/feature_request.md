@@ -1,33 +1,19 @@
 ---
 name: Feature request
-about: Suggest an idea for this project
+about: Suggest an idea for this project.
+title: '<EDIT ME> (try to follow "pkg/name: short description" format)'
+labels: 'enhancement'
+assignees: ''
 
 ---
 
-## Feature Description
+**Is your feature request related to a problem? Please describe.**
+A clear and concise description of what the problem is. E.g., "I'm always frustrated when [...]"
 
-<!-- Please describe clear and concisely which problem the feature would solve or which publisher needs it would address. -->
+**Describe the solution you'd like**
+Describe the desired functionality and its intended usage to give some context for how it would be used.
 
----------------
+Do you have any implementation in mind for this feature?
 
-_Do not alter or remove anything below. The following sections will be managed by moderators only._
-
-## Acceptance criteria
-
-* <!-- One or more bullet points for acceptance criteria. -->
-
-## Implementation Brief
-
-* <!-- One or more bullet points for how to technically implement the feature. Make sure to include changes to Storybook and visual regression tests where relevant. -->
-
-### Test Coverage
-
-* <!-- One or more bullet points for how to implement automated tests to verify the feature works. -->
-
-## QA Brief
-
-* <!-- One or more bullet points for how to test that the feature works as expected. -->
-
-## Changelog entry
-
-* <!-- One sentence summarizing the PR, to be used in the changelog. -->
+**Additional context**
+Add any other context about the feature request here.

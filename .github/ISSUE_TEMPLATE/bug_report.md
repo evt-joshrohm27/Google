@@ -1,56 +1,25 @@
 ---
-name: Bug report
-about: Create a report to help us improve
+name: Bug in syzkaller
+about: Create a report about a specific problem in syzkaller.
+title: '<EDIT ME> (try to follow "pkg/name: short description" format)'
+labels: 'bug'
+assignees: ''
 
 ---
 
-## Bug Description
+**Describe the bug**
+A clear and concise description of what the bug is.
 
-<!-- Please describe clearly and concisely what the bug is. -->
+If you just have a question, please use the `syzkaller@googlegroups.com` mailing list instead of this issue tracker.
+The issue tracker is for specific detailed bugs. If you are not sure it's a bug, please start by asking on the users list.
 
-## Steps to reproduce
+**To Reproduce**
+Steps to reproduce the behavior.
+Please provide syzkaller revision, Go version (output of go version), relevant information about host and target systems,
+`syz-manager` config if relevant. If `syz-manager` is not working overall, please provide output of `syz-manager` with -debug flag.
 
-<!-- Please provide detailed steps on how to reproduce the bug. -->
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+**Expected behavior**
+A clear and concise description of what you expected to happen.
 
-## Screenshots
-
-<!-- If applicable, please add screenshots to help explain your problem. -->
-
-## Additional Context
-
-<!-- Please complete the following information. -->
- - PHP Version: 
- - OS: [e.g. iOS]
- - Browser: [e.g. chrome, safari]
- - Plugin Version: [e.g. 22]
- - Device: [e.g. iPhone6]
-
-<!-- Please add any additional information about the bug. -->
-
----------------
-
-_Do not alter or remove anything below. The following sections will be managed by moderators only._
-
-## Acceptance criteria
-
-* <!-- One or more bullet points for acceptance criteria. -->
-
-## Implementation Brief
-
-* <!-- One or more bullet points for how to technically resolve the issue. Make sure to include changes to Storybook and visual regression tests where relevant. -->
-
-### Test Coverage
-
-* <!-- One or more bullet points for how to implement automated tests to verify the issue is resolved. -->
-
-## QA Brief
-
-* <!-- One or more bullet points for how to test that the issue has been resolved. -->
-
-## Changelog entry
-
-* <!-- One sentence summarizing the PR, to be used in the changelog. -->
+**Additional context**
+Add any other context about the problem here.
